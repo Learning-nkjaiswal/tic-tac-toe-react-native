@@ -1,0 +1,145 @@
+type CellValue = Player | ".";
+type Player = "X" | "O";
+
+export default class Game {
+    private gameFinished: boolean = false;
+    private winnerPlayer: Player | undefined;
+
+    /**
+     * gameStateCell[N]
+     * 0 | 1 | 2
+     * --+---+--
+     * 3 | 4 | 5
+     * --+---+--
+     * 6 | 7 | 8
+     */
+    private gameStateCell: CellValue[];
+
+    private currentPlayer: Player;
+
+    constructor(state: string = ".........") {
+        this.gameFinished = false;
+        this.currentPlayer = "X";
+        this.gameStateCell = state.split('') as any;
+        this.verifyGame();
+    }
+
+    public getWinner(): Player | undefined {
+        return this.winnerPlayer;
+    }
+
+    public getGameState(): CellValue[] {
+        return this.gameStateCell;
+    }
+
+    public markCell(cell: number): boolean {
+        if (this.gameFinished) {
+            return false;
+        }
+        if (this.gameStateCell[cell] !== ".") {
+            return false;
+        }
+        if (cell < 0 || cell > 8) {
+            return false;
+        }
+        this.gameStateCell[cell] = this.currentPlayer;
+        if(this.verifyGame()) {
+            return true;
+        }
+        this.nextPlayer();
+        return false;
+    }
+
+    private nextPlayer(): void {
+        if (this.currentPlayer === "X") {
+            this.currentPlayer = "O";
+        } else {
+            this.currentPlayer = "X";
+        }
+    }
+
+    private verifyGame(): boolean {
+        // check all 3 row first
+        if(this.verifyGameCell(0,1,2)) {
+            this.gameFinished = true;
+            this.winnerPlayer = this.gameStateCell[0] as any;
+            return true;
+        }
+
+        if(this.verifyGameCell(3,4,5)) {
+            this.gameFinished = true;
+            this.winnerPlayer = this.gameStateCell[3] as any;
+            return true;
+        }
+
+        if(this.verifyGameCell(6,7,8)) {
+            this.gameFinished = true;
+            this.winnerPlayer = this.gameStateCell[6] as any;
+            return true;
+        }
+
+        // check all 3 column
+        if(this.verifyGameCell(0,3,6)) {
+            this.gameFinished = true;
+            this.winnerPlayer = this.gameStateCell[0] as any;
+            return true;
+        }
+
+        if(this.verifyGameCell(1,4,7)) {
+            this.gameFinished = true;
+            this.winnerPlayer = this.gameStateCell[1] as any;
+            return true;
+        }
+
+        if(this.verifyGameCell(2,5,8)) {
+            this.gameFinished = true;
+            this.winnerPlayer = this.gameStateCell[2] as any;
+            return true;
+        }
+
+        //check both diagonal
+        if(this.verifyGameCell(0,4,8)) {
+            this.gameFinished = true;
+            this.winnerPlayer = this.gameStateCell[0] as any;
+            return true;
+        }
+
+        if(this.verifyGameCell(2,4,6)) {
+            this.gameFinished = true;
+            this.winnerPlayer = this.gameStateCell[2] as any;
+            return true;
+        }
+        return false;
+    }
+
+    private verifyGameCell(cell1: number, cell2: number, cell3: number): boolean {
+        if (this.gameStateCell[cell1] === this.gameStateCell[cell2] 
+            && this.gameStateCell[cell1] === this.gameStateCell[cell3] 
+            && this.gameStateCell[cell1] !== "."
+        ) {
+            return true;
+        }
+        return false;
+    }
+}
+
+/**
+const game = new Game();
+game.markCell(0);
+console.log(game.getGameState());
+game.markCell(0);
+console.log(game.getGameState());
+game.markCell(1);
+console.log(game.getGameState());
+game.markCell(2);
+console.log(game.getGameState());
+game.markCell(4);
+console.log(game.getGameState());
+game.markCell(3);
+console.log(game.getGameState());
+game.markCell(7);
+console.log(game.getGameState());
+console.log(game.getWinner());
+game.markCell(6);
+console.log(game.getGameState());
+*/
