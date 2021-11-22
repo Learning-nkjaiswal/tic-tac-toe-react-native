@@ -1,9 +1,9 @@
 import React, {useEffect, useState} from 'react';
-import {StyleSheet, Text, TouchableOpacity, View} from 'react-native';
+import {Button, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
 import Game from './src/game';
 
 const App = () => {
-  const game = Game.getInstance();
+  let game = Game.getInstance();
   const [gameState0, setGameState0] = useState(' ');
   const [gameState1, setGameState1] = useState(' ');
   const [gameState2, setGameState2] = useState(' ');
@@ -14,7 +14,16 @@ const App = () => {
   const [gameState7, setGameState7] = useState(' ');
   const [gameState8, setGameState8] = useState(' ');
 
-  const updateGameBoard = state => {
+  const [message, setMessage] = useState('');
+
+  const reset = () => {
+    Game.reset();
+    game = Game.getInstance();
+    updateGameBoard();
+    setMessage('');
+  };
+
+  const updateGameBoard = () => {
     setGameState0(game.getGameState()[0]);
     setGameState1(game.getGameState()[1]);
     setGameState2(game.getGameState()[2]);
@@ -31,8 +40,16 @@ const App = () => {
   }, []);
 
   const markCell = cellId => {
-    game.markCell(cellId);
+    const gameFinished = game.markCell(cellId);
     updateGameBoard(game.getGameState());
+    if (gameFinished) {
+      const winner = game.getWinner();
+      if (winner) {
+        setMessage(`Winner is ${winner}`);
+      } else {
+        setMessage(`Draw`);
+      }
+    }
   };
 
   return (
@@ -151,6 +168,10 @@ const App = () => {
           </Text>
         </TouchableOpacity>
       </View>
+      {!!message && (
+        <Text style={{fontSize: 30, color: 'green'}}>{message}</Text>
+      )}
+      <Button title="Reset" onPress={reset} />
     </View>
   );
 };

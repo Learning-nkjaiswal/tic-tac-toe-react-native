@@ -10,6 +10,9 @@ export default class Game {
     public static getInstance() {
         return this.myInstance;
     }
+    public static reset() {
+        this.myInstance = new Game();
+    }
     /**
      * gameStateCell[N]
      * 0 | 1 | 2
@@ -117,6 +120,7 @@ export default class Game {
 
         if(this.checkIfAllCellAreFilled()) {
             this.gameFinished = true;
+            return true;
         }
         return false;
     }
