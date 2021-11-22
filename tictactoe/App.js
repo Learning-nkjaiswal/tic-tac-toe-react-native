@@ -1,5 +1,14 @@
 import React, {useEffect, useState} from 'react';
-import {Button, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
+import {
+  Button,
+  Linking,
+  Platform,
+  Share,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import Game from './src/game';
 
 const App = () => {
@@ -15,6 +24,23 @@ const App = () => {
   const [gameState8, setGameState8] = useState(' ');
 
   const [message, setMessage] = useState('');
+
+  useEffect(() => {
+    if (Platform.OS === 'android') {
+      Linking.getInitialURL().then(url => {
+        if (!url) {
+          return;
+        }
+        const urlComponents = url.split('/');
+        const gameState = urlComponents[urlComponents.length - 1].replace(
+          'c',
+          '',
+        );
+        game.updateState(gameState);
+        updateGameBoard();
+      });
+    }
+  }, []);
 
   const reset = () => {
     Game.reset();
@@ -33,16 +59,7 @@ const App = () => {
     setGameState6(game.getGameState()[6]);
     setGameState7(game.getGameState()[7]);
     setGameState8(game.getGameState()[8]);
-  };
-
-  useEffect(() => {
-    updateGameBoard(game.getGameState());
-  }, []);
-
-  const markCell = cellId => {
-    const gameFinished = game.markCell(cellId);
-    updateGameBoard(game.getGameState());
-    if (gameFinished) {
+    if (game.gameFinished) {
       const winner = game.getWinner();
       if (winner) {
         setMessage(`Winner is ${winner}`);
@@ -52,8 +69,33 @@ const App = () => {
     }
   };
 
+  useEffect(() => {
+    updateGameBoard(game.getGameState());
+  }, []);
+
+  const markCell = cellId => {
+    const gameFinished = game.markCell(cellId);
+    updateGameBoard(game.getGameState());
+  };
+
+  const shareGame = () => {
+    Share.share({
+      message:
+        'Yo! See my game board. http://game/' +
+        game.getGameState().join('') +
+        'c',
+    });
+  };
+
   return (
     <View>
+      <TouchableOpacity
+        style={{width: '20%', alignSelf: 'flex-end'}}
+        onPress={shareGame}>
+        <Text style={{borderWidth: 2, padding: 10, alignSelf: 'center'}}>
+          Share
+        </Text>
+      </TouchableOpacity>
       <View style={{flexDirection: 'row'}}>
         <TouchableOpacity
           onPress={() => markCell(0)}

@@ -2,7 +2,7 @@ type CellValue = Player | ".";
 type Player = "X" | "O";
 
 export default class Game {
-    private gameFinished: boolean = false;
+    public gameFinished: boolean = false;
     private winnerPlayer: Player | undefined;
 
 
@@ -12,6 +12,28 @@ export default class Game {
     }
     public static reset() {
         this.myInstance = new Game();
+    }
+    public updateState(newState: string): void {
+        if(newState.length !== 9) {
+            return;
+        }
+        for(var i=0; i<9; i++) {
+            this.gameStateCell[i] = this.getCellValue(newState.charAt(i));
+        }
+        this.verifyGame();
+    }
+
+    private getCellValue(str: string): CellValue {
+        switch(str) {
+            case 'X':
+            case 'x':
+                return "X";
+            case "O":
+            case "o":
+                return "O";
+            default:
+                return ".";
+        }
     }
     /**
      * gameStateCell[N]
