@@ -5,6 +5,11 @@ export default class Game {
     private gameFinished: boolean = false;
     private winnerPlayer: Player | undefined;
 
+
+    private static myInstance = new Game();
+    public static getInstance() {
+        return this.myInstance;
+    }
     /**
      * gameStateCell[N]
      * 0 | 1 | 2
@@ -109,7 +114,23 @@ export default class Game {
             this.winnerPlayer = this.gameStateCell[2] as any;
             return true;
         }
+
+        if(this.checkIfAllCellAreFilled()) {
+            this.gameFinished = true;
+        }
         return false;
+    }
+
+    private checkIfAllCellAreFilled(): boolean {
+        return this.gameStateCell[0] !== "." 
+            && this.gameStateCell[1] !== "."
+            && this.gameStateCell[2] !== "."
+            && this.gameStateCell[3] !== "."
+            && this.gameStateCell[4] !== "."
+            && this.gameStateCell[5] !== "."
+            && this.gameStateCell[6] !== "."
+            && this.gameStateCell[7] !== "."
+            && this.gameStateCell[8] !== ".";
     }
 
     private verifyGameCell(cell1: number, cell2: number, cell3: number): boolean {
